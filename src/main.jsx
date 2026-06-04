@@ -515,7 +515,7 @@ function LoginScreen({ onAuth }) {
   return <main className="login-page">
     <section className="login-shell">
       <div className="login-hero">
-        <div className="brand-mark">SK</div>
+        <div className="login-logo"><img src="/images/soletrar-kids-logo.svg" alt="Logo Soletrar Kids" /></div>
         <h1>Soletrar Kids</h1>
         <p>Comunicação assistiva, treino de sílabas e rotina visual em português do Brasil.</p>
       </div>
