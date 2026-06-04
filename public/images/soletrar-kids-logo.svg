@@ -12,10 +12,7 @@
     <path d="M61 64h118c27 0 47 19 47 44s-20 44-47 44h-51l-47 40v-40H61c-27 0-47-19-47-44s20-44 47-44Z" fill="#14231f"/>
     <path d="M63 79h114c18 0 32 12 32 29s-14 29-32 29h-59l-28 24v-24H63c-18 0-32-12-32-29s14-29 32-29Z" fill="#ffffff" opacity=".08"/>
   </g>
-  <circle cx="81" cy="108" r="25" fill="#ffd95a"/>
-  <circle cx="120" cy="108" r="25" fill="#6ed39a"/>
-  <circle cx="159" cy="108" r="25" fill="#58a6ff"/>
-  <text x="81" y="125" text-anchor="middle" fill="#14231f" font-family="Arial, sans-serif" font-size="46" font-weight="900">a</text>
-  <text x="120" y="125" text-anchor="middle" fill="#14231f" font-family="Arial, sans-serif" font-size="46" font-weight="900">b</text>
-  <text x="159" y="125" text-anchor="middle" fill="#14231f" font-family="Arial, sans-serif" font-size="46" font-weight="900">c</text>
+  <text x="80" y="127" text-anchor="middle" fill="#ffd95a" font-family="Arial, sans-serif" font-size="58" font-weight="900">a</text>
+  <text x="120" y="127" text-anchor="middle" fill="#6ed39a" font-family="Arial, sans-serif" font-size="58" font-weight="900">b</text>
+  <text x="160" y="127" text-anchor="middle" fill="#58a6ff" font-family="Arial, sans-serif" font-size="58" font-weight="900">c</text>
 </svg>
