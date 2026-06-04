@@ -281,7 +281,7 @@ main { min-width: 0; padding: 24px; }
 .approval-word p { color: var(--muted); font-weight: 800; margin-top: 5px; }
 .approval-word small { display: block; color: var(--muted); margin-top: 5px; }
 .user-ledger { display: grid; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-.user-ledger-head, .user-ledger-row { min-width: 2290px; display: grid; grid-template-columns: 220px 130px 150px 230px 150px 110px 210px 110px 150px 120px 120px 130px 130px 120px 120px 150px; gap: 12px; align-items: center; padding: 12px; }
+.user-ledger-head, .user-ledger-row { min-width: 2480px; display: grid; grid-template-columns: 190px 220px 130px 150px 230px 150px 110px 210px 110px 150px 120px 120px 130px 130px 120px 120px 150px; gap: 12px; align-items: center; padding: 12px; }
 .user-ledger-head { background: #eef2f5; font-weight: 900; }
 .user-ledger-row { border-top: 1px solid var(--line); }
 .user-field { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #13231f; }

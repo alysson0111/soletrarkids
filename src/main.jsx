@@ -359,6 +359,51 @@ function formatBrazilPhone(value) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
+function createRegistrationId(uid = "") {
+  const randomPart = globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
+  return `SK-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${(uid || randomPart).slice(0, 6).toUpperCase()}-${randomPart.toUpperCase()}`;
+}
+
+async function ensureUniqueRegistrationData(database, { usuario, email, telefone }) {
+  const checks = [
+    { ref: doc(database, "usuarios_por_usuario", usuario), message: "Este usuário já está em uso." },
+    { ref: doc(database, "usuarios_por_email", email), message: "Este e-mail já está cadastrado." },
+    { ref: doc(database, "usuarios_por_telefone", telefone), message: "Este telefone já está cadastrado." }
+  ];
+
+  for (const check of checks) {
+    const snapshot = await getDoc(check.ref);
+    if (snapshot.exists()) return check.message;
+  }
+
+  const existingChecks = [
+    { field: "usuario", value: usuario, message: "Este usuário já está em uso." },
+    { field: "email", value: email, message: "Este e-mail já está cadastrado." },
+    { field: "telefone", value: telefone, message: "Este telefone já está cadastrado." }
+  ];
+
+  for (const check of existingChecks) {
+    const snapshot = await getDocs(query(collection(database, "usuarios"), where(check.field, "==", check.value)));
+    if (!snapshot.empty) return check.message;
+  }
+
+  return "";
+}
+
+async function saveRegistrationIndexes(database, { uid, usuario, email, telefone, cadastroId }) {
+  const indexPayload = {
+    uid,
+    usuario,
+    email,
+    telefone,
+    cadastroId,
+    criadoEm: serverTimestamp()
+  };
+  await setDoc(doc(database, "usuarios_por_usuario", usuario), indexPayload);
+  await setDoc(doc(database, "usuarios_por_email", email), indexPayload);
+  await setDoc(doc(database, "usuarios_por_telefone", telefone), indexPayload);
+}
+
 function getRegistrationOrigin(kind = "auto") {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
   return {
@@ -436,10 +481,11 @@ function LoginScreen({ onAuth }) {
     setLoading(true);
     try {
       const usuario = normalizeUsername(form.usuario);
-      const usernameRef = doc(db, "usuarios_por_usuario", usuario);
-      const usernameSnapshot = await getDoc(usernameRef);
-      if (usernameSnapshot.exists()) {
-        setMessage("Este usuário já está em uso.");
+      const email = form.email.trim().toLowerCase();
+      const telefone = onlyDigits(form.telefone);
+      const duplicateMessage = await ensureUniqueRegistrationData(db, { usuario, email, telefone });
+      if (duplicateMessage) {
+        setMessage(duplicateMessage);
         setLoading(false);
         return;
       }
@@ -447,13 +493,15 @@ function LoginScreen({ onAuth }) {
       const credential = await createUserWithEmailAndPassword(auth, form.email.trim(), form.senha);
       await updateProfile(credential.user, { displayName: form.nome.trim() });
       const selectedPlan = form.plano === "pro" ? "pro" : "free";
+      const cadastroId = createRegistrationId(credential.user.uid);
       await setDoc(doc(db, "usuarios", credential.user.uid), {
+        cadastroId,
         nomeCompleto: form.nome.trim(),
         usuario,
-        telefone: onlyDigits(form.telefone),
+        telefone,
         telefoneFormatado: formatBrazilPhone(form.telefone),
-        email: form.email.trim().toLowerCase(),
-        papel: form.email.trim().toLowerCase() === rootEmail ? "root" : "cliente",
+        email,
+        papel: email === rootEmail ? "root" : "cliente",
         status: "ativo",
         plano: selectedPlan,
         limiteDiarioMinutos: selectedPlan === "free" ? 10 : null,
@@ -466,11 +514,7 @@ function LoginScreen({ onAuth }) {
         origemCadastro: getRegistrationOrigin("cadastro_usuario"),
         criadoEm: serverTimestamp()
       });
-      await setDoc(usernameRef, {
-        uid: credential.user.uid,
-        email: form.email.trim().toLowerCase(),
-        criadoEm: serverTimestamp()
-      });
+      await saveRegistrationIndexes(db, { uid: credential.user.uid, usuario, email, telefone, cadastroId });
       onAuth(credential.user);
     } catch (error) {
       setMessage(authMessage(error));
@@ -2152,10 +2196,11 @@ function AdminUsers({ planSettings }) {
 
     setBusy("create");
     try {
-      const usernameRef = doc(db, "usuarios_por_usuario", usuario);
-      const usernameSnapshot = await getDoc(usernameRef);
-      if (usernameSnapshot.exists()) {
-        setMessage("Este usuário já está em uso.");
+      const email = form.email.trim().toLowerCase();
+      const telefone = onlyDigits(form.telefone);
+      const duplicateMessage = await ensureUniqueRegistrationData(db, { usuario, email, telefone });
+      if (duplicateMessage) {
+        setMessage(duplicateMessage);
         setBusy("");
         return;
       }
@@ -2167,12 +2212,14 @@ function AdminUsers({ planSettings }) {
       const proValue = Number(planSettings?.proMensalidade || 0);
       const monthlyValue = Number(form.mensalidade || 0) || (form.plano === "pro" ? proValue : 0);
       const discountValue = Number(form.desconto || 0);
+      const cadastroId = createRegistrationId(credential.user.uid);
       const profile = {
+        cadastroId,
         nomeCompleto: form.nome.trim(),
         usuario,
-        telefone: onlyDigits(form.telefone),
+        telefone,
         telefoneFormatado: formatBrazilPhone(form.telefone),
-        email: form.email.trim().toLowerCase(),
+        email,
         plano: form.plano,
         limiteDiarioMinutos: form.plano === "free" ? 10 : null,
         papel: form.papel,
@@ -2188,7 +2235,7 @@ function AdminUsers({ planSettings }) {
         criadoEm: serverTimestamp()
       };
       await setDoc(doc(db, "usuarios", credential.user.uid), profile);
-      await setDoc(usernameRef, { uid: credential.user.uid, email: profile.email, criadoEm: serverTimestamp() });
+      await saveRegistrationIndexes(db, { uid: credential.user.uid, usuario, email, telefone, cadastroId });
       await signOut(secondaryAuth);
       setForm({ nome: "", usuario: "", telefone: "", email: "", senha: "", plano: "free", papel: "cliente", status: "ativo", pagamento: "ativo", mensalidade: "", desconto: "", vencimento: "" });
       setMessage("Usuário criado com sucesso.");
@@ -2282,9 +2329,10 @@ function AdminUsers({ planSettings }) {
 
     <div className="user-ledger">
       <div className="user-ledger-head">
-        <span>Nome</span><span>Usuário</span><span>Telefone</span><span>E-mail</span><span>Cadastro</span><span>Origem</span><span>Fuso/Idioma</span><span>Plano</span><span>Migração Pro</span><span>Tipo</span><span>Status</span><span>Pagamento</span><span>Mensalidade</span><span>Desconto</span><span>Valor final</span><span>Vencimento</span>
+        <span>ID</span><span>Nome</span><span>Usuário</span><span>Telefone</span><span>E-mail</span><span>Cadastro</span><span>Origem</span><span>Fuso/Idioma</span><span>Plano</span><span>Migração Pro</span><span>Tipo</span><span>Status</span><span>Pagamento</span><span>Mensalidade</span><span>Desconto</span><span>Valor final</span><span>Vencimento</span>
       </div>
       {users.map((user) => <article className="user-ledger-row" key={user.id}>
+        <span className="user-field">{user.cadastroId || user.id}</span>
         <strong className="user-field">{user.nomeCompleto || "Sem nome"}</strong>
         <span className="user-field">{user.usuario || "sem usuário"}</span>
         <span className="user-field">{user.telefoneFormatado || user.telefone || "sem telefone"}</span>
