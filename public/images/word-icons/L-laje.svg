@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="laje">
+  <rect width="240" height="240" rx="28" fill="#cbe9a8"/>
+  <circle cx="120" cy="86" r="52" fill="rgba(255,255,255,.72)"/>
+  <text x="120" y="108" text-anchor="middle" font-family="Arial, sans-serif" font-size="76" font-weight="900" fill="#2f4b14">L</text>
+  <text x="120" y="178" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#2f4b14">laje</text>
+</svg>
