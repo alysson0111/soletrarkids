@@ -9,7 +9,6 @@
   <rect width="240" height="240" rx="42" fill="#f7fbf8"/>
   <g filter="url(#shadow)">
     <path d="M61 64h118c27 0 47 19 47 44s-20 44-47 44h-51l-47 40v-40H61c-27 0-47-19-47-44s20-44 47-44Z" fill="#14231f"/>
-    <path d="M63 79h114c18 0 32 12 32 29s-14 29-32 29h-59l-28 24v-24H63c-18 0-32-12-32-29s14-29 32-29Z" fill="#ffffff" opacity=".08"/>
   </g>
   <text x="80" y="127" text-anchor="middle" fill="#ffd95a" font-family="Arial, sans-serif" font-size="58" font-weight="900">a</text>
   <text x="120" y="127" text-anchor="middle" fill="#6ed39a" font-family="Arial, sans-serif" font-size="58" font-weight="900">b</text>
