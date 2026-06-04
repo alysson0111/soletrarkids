@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Soletrar Kids</title>
+  <rect width="64" height="64" rx="14" fill="#14231f"/>
+  <path d="M17 17h30c7 0 12 5 12 12s-5 12-12 12H34L20 53V41h-3C10 41 5 36 5 29s5-12 12-12Z" fill="#f7fbf8"/>
+  <circle cx="23" cy="29" r="4" fill="#ffd95a"/>
+  <circle cx="33" cy="29" r="4" fill="#6ed39a"/>
+  <circle cx="43" cy="29" r="4" fill="#58a6ff"/>
+</svg>
