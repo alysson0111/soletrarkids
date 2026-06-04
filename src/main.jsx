@@ -809,7 +809,7 @@ function Sidebar({ view, setView, lowStim, setLowStim, largeTouch, setLargeTouch
   if (isRoot) items.push(["aprovacoes", "Aprovações", "✅"], ["admin", "Usuários", "👥"], ["administrador", "Administrador", "⚙️"]);
   return (
     <aside className="sidebar">
-      <div className="brand"><div className="brand-mark">💬</div><div><h1>Comunica Kids</h1><p>CAA, fala assistiva e rotina visual</p></div></div>
+      <div className="brand"><div className="brand-mark">💬</div><div><h1>Soletrar Kids</h1><p>CAA, fala assistiva e rotina visual</p></div></div>
       <nav className="nav">{items.map(([id, label, icon]) => <button key={id} className={view === id ? "active" : ""} onClick={() => setView(id)}><span aria-hidden="true">{icon}</span>{label}</button>)}</nav>
       <div className="sidebar-footer">
         <Switch label="Baixa estimulação" value={lowStim} onChange={() => setLowStim(!lowStim)} />
