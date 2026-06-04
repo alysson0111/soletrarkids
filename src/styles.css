@@ -109,7 +109,7 @@ main { min-width: 0; padding: 24px; }
 .symbol small, .word-card small { margin-top: 7px; color: #35443f; font-size: .78rem; font-weight: 800; opacity: .78; }
 .c-want { background: var(--mint); } .c-need { background: var(--blue); } .c-feel { background: var(--rose); } .c-routine { background: var(--amber); } .c-people { background: var(--green); }
 
-.alphabet-board, .vowels-board, .word-search-board, .paint-board, .drawing-board, .math-board, .routine-list, .exercise-list, .prompt-list, .note-list, .admin-panel, .approval-list { display: grid; gap: 12px; }
+.alphabet-board, .vowels-board, .word-search-board, .memory-board, .paint-board, .drawing-board, .math-board, .routine-list, .exercise-list, .prompt-list, .note-list, .admin-panel, .approval-list { display: grid; gap: 12px; }
 .letter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
 .letter-btn { min-height: 50px; border-radius: 8px; background: #edf2ef; color: #14231f; border: 1px solid #dce3df; font-size: 1.2rem; font-weight: 900; }
 .letter-btn.active { background: #14231f; color: #fff; }
@@ -179,6 +179,49 @@ main { min-width: 0; padding: 24px; }
 .word-search-word small { margin-top: 3px; color: var(--muted); font-size: .78rem; font-weight: 800; }
 .word-search-word.active { border-color: #14231f; box-shadow: inset 0 0 0 2px #14231f; }
 .word-search-word.done { background: #e7f7ef; border-color: #8ecfb0; }
+.memory-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(25,35,31,.06);
+}
+.memory-grid.level-dificil { grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); }
+.memory-card {
+  position: relative;
+  min-height: 132px;
+  border-radius: 8px;
+  border: 1px solid #dce3df;
+  background: #14231f;
+  color: #fff;
+  overflow: hidden;
+  font-weight: 900;
+}
+.memory-card.open { background: #fff; color: #14231f; border-color: #9ecfbd; }
+.memory-card.done { background: #e7f7ef; border-color: #72c49a; }
+.memory-back, .memory-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  transition: opacity .16s ease, transform .16s ease;
+}
+.memory-back { font-size: 2.4rem; background: #14231f; }
+.memory-face {
+  opacity: 0;
+  transform: scale(.96);
+  grid-template-rows: 1fr auto;
+  gap: 8px;
+}
+.memory-card.open .memory-back { opacity: 0; transform: scale(1.04); }
+.memory-card.open .memory-face { opacity: 1; transform: scale(1); }
+.memory-face b { font-size: 2.8rem; line-height: 1; }
+.memory-face small { color: #30403a; font-size: .86rem; text-align: center; }
 .paint-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
 .drawing-picker { min-width: 220px; display: grid; gap: 6px; color: var(--muted); font-size: .82rem; font-weight: 900; }
 .drawing-picker select { min-height: 42px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: #fff; color: var(--ink); font-weight: 800; }
@@ -440,6 +483,20 @@ textarea { width: 100%; min-height: 92px; resize: vertical; }
     font-size: 1.35rem;
   }
   .word-search-word b { font-size: .9rem; }
+  .memory-toolbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .memory-toolbar .segmented { grid-column: 1 / -1; width: 100%; }
+  .memory-toolbar .tool { width: 100%; min-height: 42px; padding-inline: 8px; }
+  .memory-grid,
+  .memory-grid.level-dificil {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
+  }
+  .memory-card { min-height: 86px; }
+  .memory-back { font-size: 1.7rem; }
+  .memory-face { padding: 6px; gap: 4px; }
+  .memory-face b { font-size: 1.75rem; }
+  .memory-face small { font-size: .68rem; line-height: 1.1; }
   .paint-canvas { gap: 4px; padding: 8px; }
   .paint-cell { min-height: 32px; border-radius: 7px; }
   .drawing-layout { padding: 8px; justify-content: start; }

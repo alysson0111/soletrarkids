@@ -293,6 +293,7 @@ const viewText = {
   alfabeto: ["Alfabeto visual de A a Z", "Selecione uma letra para ver imagens e palavras correspondentes. Toque em uma palavra para ouvir e adicionar à frase atual."],
   vogais: ["Vogais e Alfabeto", "Treine vogais e famílias silábicas como BA BE BI BO BU com apoio de fala em português do Brasil."],
   cacapalavras: ["Caça Palavras", "Encontre palavras por tema, como frutas, transportes e objetos, com imagens e fala guiando a próxima letra correta."],
+  memoria: ["Jogo da Memória", "Encontre pares de frutas, transportes, animais ou números com três níveis de dificuldade e cartas sempre embaralhadas."],
   desenhos: ["Desenhos", "Pinte a grade por número, selecione a cor correta e veja a imagem se formando."],
   concentracao: ["Concentração", "Escolha a cor pelo número, siga a sequência dos blocos e veja o desenho se formando com apoio de fala."],
   rotinas: ["Rotinas visuais previsíveis", "Use sequências curtas para antecipar transições, diminuir ansiedade e apoiar autonomia."],
@@ -779,12 +780,13 @@ function App() {
           <p>O Plano Free libera {planSettings.freeMinutosDiarios || 10} minutos de uso por dia. Para acesso completo, migre para o Plano Pro por {proPlanPriceText}/mês.</p>
           <button className="tool primary" onClick={migrateToPro}>Migrar para Pro</button>
         </section> : <>
-        <div className={`workspace ${["admin", "administrador", "cacapalavras"].includes(view) ? "workspace-full" : ""}`}>
+        <div className={`workspace ${["admin", "administrador", "cacapalavras", "memoria"].includes(view) ? "workspace-full" : ""}`}>
           <div>
             {view === "comunicar" && <Communication symbols={symbols} category={category} setCategory={setCategory} query={query} setQuery={setQuery} addPhrase={addPhrase} custom={custom} setCustom={setCustom} />}
             {view === "alfabeto" && <Alphabet letter={letter} setLetter={setLetter} addPhrase={addPhrase} words={currentLetterWords} status={letterStatus} saveCurrentLetter={saveCurrentLetter} saveWordsForLetter={saveWordsForLetter} submitPendingWord={submitPendingWord} isRoot={isRoot} />}
             {view === "vogais" && <VowelsAlphabet />}
             {view === "cacapalavras" && <WordSearchGame bump={bump} />}
+            {view === "memoria" && <MemoryGame bump={bump} />}
             {view === "desenhos" && <DrawingsByNumber bump={bump} selectedNumber={drawingSelectedNumber} setSelectedNumber={setDrawingSelectedNumber} />}
             {view === "concentracao" && <PaintByNumber bump={bump} selectedNumber={paintSelectedNumber} setSelectedNumber={setPaintSelectedNumber} />}
             {view === "rotinas" && <Routines bump={bump} />}
@@ -798,7 +800,7 @@ function App() {
           </div>
           {view === "desenhos" && <ColorNumberPanel colors={drawingColors} selectedNumber={drawingSelectedNumber} setSelectedNumber={setDrawingSelectedNumber} />}
           {view === "concentracao" && <ColorNumberPanel colors={paintColors} selectedNumber={paintSelectedNumber} setSelectedNumber={setPaintSelectedNumber} />}
-          {!["admin", "administrador", "desenhos", "concentracao", "cacapalavras"].includes(view) && <PhrasePanel phrase={phrase} setPhrase={setPhrase} phraseText={phraseText} bump={bump} />}
+          {!["admin", "administrador", "desenhos", "concentracao", "cacapalavras", "memoria"].includes(view) && <PhrasePanel phrase={phrase} setPhrase={setPhrase} phraseText={phraseText} bump={bump} />}
         </div>
         </>}
       </main>
@@ -807,7 +809,7 @@ function App() {
 }
 
 function Sidebar({ view, setView, lowStim, setLowStim, largeTouch, setLargeTouch, user, isRoot }) {
-  const items = [["comunicar", "Comunicar", "💬"], ["alfabeto", "A-Z", "🔤"], ["vogais", "Vogais e Alfabeto", "🅰️"], ["cacapalavras", "Caça Palavras", "🔎"], ["desenhos", "Desenhos", "🖍️"], ["concentracao", "Concentração", "🎨"], ["rotinas", "Rotinas", "📅"], ["continhas", "Continhas", "🧮"], ["treino", "Treino", "🗣️"], ["prompts", "Pistas", "✨"], ["progresso", "Progresso", "📊"]];
+  const items = [["comunicar", "Comunicar", "💬"], ["alfabeto", "A-Z", "🔤"], ["vogais", "Vogais e Alfabeto", "🅰️"], ["cacapalavras", "Caça Palavras", "🔎"], ["memoria", "Jogo da Memória", "🧠"], ["desenhos", "Desenhos", "🖍️"], ["concentracao", "Concentração", "🎨"], ["rotinas", "Rotinas", "📅"], ["continhas", "Continhas", "🧮"], ["treino", "Treino", "🗣️"], ["prompts", "Pistas", "✨"], ["progresso", "Progresso", "📊"]];
   if (isRoot) items.push(["aprovacoes", "Aprovações", "✅"], ["admin", "Usuários", "👥"], ["administrador", "Administrador", "⚙️"]);
   return (
     <aside className="sidebar">
@@ -1079,6 +1081,189 @@ function WordSearchGame({ bump }) {
       </aside>
     </div>
 
+    <p className={completed ? "syllable-feedback" : "syllable-feedback error"}>{feedback}</p>
+  </section>;
+}
+
+const memoryLevels = {
+  facil: { label: "Fácil", pairs: 4 },
+  medio: { label: "Médio", pairs: 6 },
+  dificil: { label: "Difícil", pairs: 8 }
+};
+
+const memoryThemes = [
+  {
+    id: "frutas",
+    title: "Frutas",
+    cards: [
+      { id: "banana", label: "Banana", icon: "🍌" },
+      { id: "abacaxi", label: "Abacaxi", icon: "🍍" },
+      { id: "morango", label: "Morango", icon: "🍓" },
+      { id: "melancia", label: "Melancia", icon: "🍉" },
+      { id: "laranja", label: "Laranja", icon: "🍊" },
+      { id: "uva", label: "Uva", icon: "🍇" },
+      { id: "maca", label: "Maçã", icon: "🍎" },
+      { id: "pera", label: "Pera", icon: "🍐" }
+    ]
+  },
+  {
+    id: "transportes",
+    title: "Transportes",
+    cards: [
+      { id: "carro", label: "Carro", icon: "🚗" },
+      { id: "bicicleta", label: "Bicicleta", icon: "🚲" },
+      { id: "aviao", label: "Avião", icon: "✈️" },
+      { id: "onibus", label: "Ônibus", icon: "🚌" },
+      { id: "moto", label: "Moto", icon: "🏍️" },
+      { id: "barco", label: "Barco", icon: "⛵" },
+      { id: "trem", label: "Trem", icon: "🚆" },
+      { id: "caminhao", label: "Caminhão", icon: "🚚" }
+    ]
+  },
+  {
+    id: "animais",
+    title: "Animais",
+    cards: [
+      { id: "cachorro", label: "Cachorro", icon: "🐶" },
+      { id: "gato", label: "Gato", icon: "🐱" },
+      { id: "leao", label: "Leão", icon: "🦁" },
+      { id: "macaco", label: "Macaco", icon: "🐵" },
+      { id: "peixe", label: "Peixe", icon: "🐟" },
+      { id: "passaro", label: "Pássaro", icon: "🐦" },
+      { id: "coelho", label: "Coelho", icon: "🐰" },
+      { id: "tartaruga", label: "Tartaruga", icon: "🐢" }
+    ]
+  },
+  {
+    id: "numeros",
+    title: "Números",
+    cards: [
+      { id: "um", label: "Um", icon: "1" },
+      { id: "dois", label: "Dois", icon: "2" },
+      { id: "tres", label: "Três", icon: "3" },
+      { id: "quatro", label: "Quatro", icon: "4" },
+      { id: "cinco", label: "Cinco", icon: "5" },
+      { id: "seis", label: "Seis", icon: "6" },
+      { id: "sete", label: "Sete", icon: "7" },
+      { id: "oito", label: "Oito", icon: "8" }
+    ]
+  }
+];
+
+function buildMemoryDeck(theme, level) {
+  const pairs = memoryLevels[level]?.pairs || memoryLevels.facil.pairs;
+  const selected = shuffleList(theme.cards).slice(0, pairs);
+  return shuffleList(selected.flatMap((item) => [
+    { ...item, cardId: `${item.id}-a`, pairId: item.id },
+    { ...item, cardId: `${item.id}-b`, pairId: item.id }
+  ]));
+}
+
+function MemoryGame({ bump }) {
+  const [themeId, setThemeId] = useState("frutas");
+  const [level, setLevel] = useState("facil");
+  const [round, setRound] = useState(0);
+  const [flipped, setFlipped] = useState([]);
+  const [matched, setMatched] = useState({});
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState("Escolha duas cartas para encontrar o par.");
+  const theme = memoryThemes.find((item) => item.id === themeId) || memoryThemes[0];
+  const cards = useMemo(() => buildMemoryDeck(theme, level), [themeId, level, round]);
+  const matchedCount = Object.keys(matched).filter((key) => matched[key]).length;
+  const totalPairs = cards.length / 2;
+  const completed = totalPairs > 0 && matchedCount >= totalPairs;
+
+  useEffect(() => {
+    setFlipped([]);
+    setMatched({});
+    setBusy(false);
+    setFeedback(`${theme.title}, nível ${memoryLevels[level].label}. Cartas embaralhadas.`);
+  }, [themeId, level, round, theme.title]);
+
+  const restart = () => {
+    setRound((current) => current + 1);
+    speak("Jogo da memória recomeçado. Cartas embaralhadas.");
+  };
+
+  const chooseTheme = (nextThemeId) => {
+    const nextTheme = memoryThemes.find((item) => item.id === nextThemeId) || memoryThemes[0];
+    setThemeId(nextTheme.id);
+    speak(`Tema ${nextTheme.title}.`);
+  };
+
+  const chooseLevel = (nextLevel) => {
+    setLevel(nextLevel);
+    speak(`Nível ${memoryLevels[nextLevel].label}.`);
+  };
+
+  const flipCard = (card) => {
+    if (busy || matched[card.pairId] || flipped.some((item) => item.cardId === card.cardId)) return;
+
+    const nextFlipped = flipped.concat(card);
+    setFlipped(nextFlipped);
+    speak(card.label);
+
+    if (nextFlipped.length < 2) {
+      setFeedback(`Carta ${card.label}. Escolha outra carta.`);
+      return;
+    }
+
+    setBusy(true);
+    const [first, second] = nextFlipped;
+    if (first.pairId === second.pairId) {
+      const nextMatched = { ...matched, [card.pairId]: true };
+      setMatched(nextMatched);
+      setFlipped([]);
+      setBusy(false);
+      bump();
+      const nextMatchedCount = Object.keys(nextMatched).filter((key) => nextMatched[key]).length;
+      const message = nextMatchedCount >= totalPairs ? "Parabéns. Você encontrou todos os pares." : `Muito bem. Par de ${card.label} encontrado.`;
+      setFeedback(message);
+      speak(message);
+      return;
+    }
+
+    const message = `${first.label} e ${second.label}. Não formam par. Tente novamente.`;
+    setFeedback(message);
+    speak(message);
+    window.setTimeout(() => {
+      setFlipped([]);
+      setBusy(false);
+    }, 1100);
+  };
+
+  return <section className="memory-board">
+    <div className="memory-toolbar">
+      <div className="segmented">
+        {Object.entries(memoryLevels).map(([id, item]) => <button key={id} className={level === id ? "active" : ""} onClick={() => chooseLevel(id)}>{item.label}</button>)}
+      </div>
+      <div className="segmented">
+        {memoryThemes.map((item) => <button key={item.id} className={themeId === item.id ? "active" : ""} onClick={() => chooseTheme(item.id)}>{item.title}</button>)}
+      </div>
+      <button className="tool" onClick={() => speak(`${theme.title}, nível ${memoryLevels[level].label}. Encontre os pares.`)}>Falar instrução</button>
+      <button className="tool primary" onClick={restart}>Recomeçar</button>
+    </div>
+
+    <div className={`memory-grid level-${level}`}>
+      {cards.map((card) => {
+        const isOpen = matched[card.pairId] || flipped.some((item) => item.cardId === card.cardId);
+        return <button
+          key={card.cardId}
+          className={`memory-card ${isOpen ? "open" : ""} ${matched[card.pairId] ? "done" : ""}`}
+          onClick={() => flipCard(card)}
+          aria-label={isOpen ? card.label : "Carta virada"}
+        >
+          <span className="memory-back">?</span>
+          <span className="memory-face"><b>{card.icon}</b><small>{card.label}</small></span>
+        </button>;
+      })}
+    </div>
+
+    <div className="round-panel">
+      <strong>{matchedCount} de {totalPairs} par(es)</strong>
+      <span>{completed ? "Jogo concluído" : "Cartas embaralhadas a cada nova sessão ou recomeço"}</span>
+      <button className="tool primary" disabled={!completed} onClick={() => speak("Parabéns. Jogo da memória concluído.")}>Celebrar</button>
+    </div>
     <p className={completed ? "syllable-feedback" : "syllable-feedback error"}>{feedback}</p>
   </section>;
 }
