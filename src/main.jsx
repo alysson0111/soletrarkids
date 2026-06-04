@@ -835,7 +835,8 @@ function Communication({ symbols, category, setCategory, query, setQuery, addPhr
   const addCustom = (event) => {
     event.preventDefault();
     if (!text.trim()) return;
-    setCustom(custom.concat({ category: customCategory, text: text.trim(), icon: "⭐", color: colors[customCategory] }));
+    const trimmedText = text.trim();
+    setCustom(custom.concat({ category: customCategory, text: trimmedText, icon: communicationIconFor(trimmedText), color: colors[customCategory] }));
     setText("");
   };
   return <>
@@ -845,8 +846,17 @@ function Communication({ symbols, category, setCategory, query, setQuery, addPhr
   </>;
 }
 
+const communicationIconFallbacks = {
+  irmao: "👦",
+  saudades: "🥹"
+};
+
+function communicationIconFor(text, currentIcon = "⭐") {
+  return communicationIconFallbacks[wordKey(text)] || currentIcon;
+}
+
 function SymbolCard({ item, onClick }) {
-  return <button className={`symbol ${item.color}`} onClick={onClick}><Picto value={item.icon} /><span><strong>{item.text}</strong><small>{categories.find((cat) => cat.id === item.category)?.label || "Personalizado"}</small></span></button>;
+  return <button className={`symbol ${item.color}`} onClick={onClick}><Picto value={communicationIconFor(item.text, item.icon)} /><span><strong>{item.text}</strong><small>{categories.find((cat) => cat.id === item.category)?.label || "Personalizado"}</small></span></button>;
 }
 
 function Picto({ value }) {
