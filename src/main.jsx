@@ -559,11 +559,29 @@ function LoginScreen({ onAuth }) {
   return <main className="login-page">
     <section className="login-shell">
       <div className="login-hero">
-        <div className="login-logo"><img src="/images/soletrar-kids-logo.svg" alt="Logo Soletrar Kids" /></div>
+        <div className="login-logo-row">
+          <div className="login-logo"><img src="/images/soletrar-kids-logo.svg" alt="Logo Soletrar Kids" /></div>
+          <span className="login-kicker">Apoio para fala, rotina e comunica&ccedil;&atilde;o</span>
+        </div>
         <h1>Soletrar Kids</h1>
-        <p>Comunicação assistiva, treino de sílabas e rotina visual em português do Brasil.</p>
+        <p className="login-copy">Um ambiente calmo para crian&ccedil;as com TEA, apraxia, dificuldades motoras de fala, psicomotricidade ou comunica&ccedil;&atilde;o n&atilde;o verbal.</p>
+        <div className="login-support" aria-label="Publico atendido">
+          <span>TEA</span>
+          <span>Apraxia</span>
+          <span>CAA</span>
+          <span>Rotina visual</span>
+        </div>
+        <div className="login-preview" aria-hidden="true">
+          <div><strong>Quero</strong><span>&#128167;</span></div>
+          <div><strong>Preciso</strong><span>&#129658;</span></div>
+          <div><strong>Sinto</strong><span>&#128522;</span></div>
+        </div>
       </div>
       <div className="login-card">
+        <div className="auth-intro">
+          <strong>{mode === "login" ? "Entrar com tranquilidade" : "Criar acesso da família"}</strong>
+          <span>{mode === "login" ? "Use usuário ou e-mail para continuar." : "O cadastro fica organizado para aprovação e acompanhamento."}</span>
+        </div>
         <div className="login-tabs" role="tablist">
           <button className={mode === "login" ? "active" : ""} onClick={() => { setMode("login"); setMessage(""); }}>Entrar</button>
           <button className={mode === "register" ? "active" : ""} onClick={() => { setMode("register"); setMessage(""); }}>Criar conta</button>
