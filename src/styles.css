@@ -288,6 +288,20 @@ main { min-width: 0; padding: 24px; }
 .math-problem span { font-size: clamp(3.5rem, 11vw, 7rem); line-height: 1; }
 .math-problem small { font-size: clamp(2.4rem, 8vw, 5rem); color: var(--focus); }
 .math-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.math-visual-panel { position: sticky; top: 18px; display: grid; gap: 12px; padding: 14px; border: 1px solid #cfdfd8; border-radius: 8px; background: #fbfdfb; box-shadow: var(--shadow); }
+.math-visual-panel > strong { font-size: 1.05rem; }
+.math-visual-title { min-height: 84px; display: flex; align-items: center; justify-content: center; gap: 18px; border-radius: 8px; background: #eef7f3; border: 1px solid #d5e6df; color: #14231f; font-weight: 900; }
+.math-visual-title span { font-size: 2.8rem; line-height: 1; }
+.math-visual-title small { font-size: 2rem; color: var(--focus); }
+.math-visual-content { display: grid; gap: 10px; }
+.math-visual-content.multiply, .math-visual-content.divide { max-height: 420px; overflow-y: auto; padding-right: 4px; }
+.math-object-group { display: grid; gap: 7px; padding: 10px; border-radius: 8px; border: 1px solid #dfe7e2; background: #fff; }
+.math-object-group.muted { background: #f3f0ed; opacity: .72; text-decoration: line-through; }
+.math-object-group small { color: var(--muted); font-weight: 900; }
+.math-objects { display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 7px; }
+.math-objects span { min-height: 38px; display: grid; place-items: center; border-radius: 8px; background: #f7faf8; border: 1px solid #e4ece7; font-size: 1.65rem; }
+.math-visual-symbol { display: grid; place-items: center; min-height: 38px; color: var(--focus); font-size: 2rem; font-weight: 900; }
+.math-visual-note { display: grid; gap: 8px; padding-top: 4px; color: var(--muted); font-weight: 800; line-height: 1.4; }
 .answer-btn { min-height: 82px; border-radius: 8px; background: var(--amber); color: #14231f; border: 1px solid #e5ca7d; font-size: 2rem; font-weight: 900; }
 .routine-card, .exercise-card, .prompt-card, .note-card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 14px; display: grid; gap: 12px; box-shadow: 0 8px 20px rgba(25,35,31,.06); }
 .approval-card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; box-shadow: 0 8px 20px rgba(25,35,31,.06); }
@@ -391,7 +405,7 @@ textarea { width: 100%; min-height: 92px; resize: vertical; }
   .switch span { width: 20px; height: 20px; }
   .switch.on span { transform: translateX(18px); }
   .workspace, .topbar { grid-template-columns: 1fr; }
-  .phrase-panel, .color-panel { position: static; }
+  .phrase-panel, .color-panel, .math-visual-panel { position: static; }
 }
 
 @media (max-width: 620px) {

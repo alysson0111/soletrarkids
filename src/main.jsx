@@ -635,6 +635,8 @@ function App() {
   const [planSettings, setPlanSettings] = useState(defaultPlanSettings);
   const [paintSelectedNumber, setPaintSelectedNumber] = useState("1");
   const [drawingSelectedNumber, setDrawingSelectedNumber] = useState("1");
+  const [mathOperation, setMathOperation] = useState("add");
+  const [mathProblem, setMathProblem] = useState(() => createMathProblem("add", "medio"));
 
   const symbols = useMemo(() => baseSymbols.concat(custom).filter((item) => {
     const byCategory = category === "all" || item.category === category;
@@ -852,7 +854,7 @@ function App() {
             {view === "desenhos" && <DrawingsByNumber bump={bump} selectedNumber={drawingSelectedNumber} setSelectedNumber={setDrawingSelectedNumber} />}
             {view === "concentracao" && <PaintByNumber bump={bump} selectedNumber={paintSelectedNumber} setSelectedNumber={setPaintSelectedNumber} />}
             {view === "rotinas" && <Routines bump={bump} />}
-            {view === "continhas" && <MathPractice bump={bump} />}
+            {view === "continhas" && <MathPractice bump={bump} operation={mathOperation} setOperation={setMathOperation} problem={mathProblem} setProblem={setMathProblem} />}
             {view === "treino" && <Exercises bump={bump} />}
             {view === "prompts" && <Prompts setPhrase={setPhrase} bump={bump} />}
             {view === "progresso" && <Progress name={name} notes={notes} setNotes={setNotes} count={count} />}
@@ -862,7 +864,8 @@ function App() {
           </div>
           {view === "desenhos" && <ColorNumberPanel colors={drawingColors} selectedNumber={drawingSelectedNumber} setSelectedNumber={setDrawingSelectedNumber} />}
           {view === "concentracao" && <ColorNumberPanel colors={paintColors} selectedNumber={paintSelectedNumber} setSelectedNumber={setPaintSelectedNumber} />}
-          {!["admin", "administrador", "desenhos", "concentracao", "cacapalavras", "memoria"].includes(view) && <PhrasePanel phrase={phrase} setPhrase={setPhrase} phraseText={phraseText} bump={bump} />}
+          {view === "continhas" && <MathVisualPanel operation={mathOperation} problem={mathProblem} />}
+          {!["admin", "administrador", "desenhos", "concentracao", "cacapalavras", "memoria", "continhas"].includes(view) && <PhrasePanel phrase={phrase} setPhrase={setPhrase} phraseText={phraseText} bump={bump} />}
         </div>
         </>}
       </main>
@@ -2007,10 +2010,8 @@ function createMathProblem(operation, level = "medio") {
   return { left, right, answer, options: Array.from(options).sort(() => Math.random() - 0.5) };
 }
 
-function MathPractice({ bump }) {
-  const [operation, setOperation] = useState("add");
+function MathPractice({ bump, operation, setOperation, problem, setProblem }) {
   const [level, setLevel] = useState("medio");
-  const [problem, setProblem] = useState(() => createMathProblem("add", "medio"));
   const [feedback, setFeedback] = useState("Escolha uma operação e toque em uma resposta.");
   const currentOperation = mathOperations[operation];
   const spokenProblem = `${problem.left} ${currentOperation.speak} ${problem.right}`;
@@ -2080,6 +2081,72 @@ function MathPractice({ bump }) {
 
     <p className={feedback.includes("Ainda") ? "syllable-feedback error" : "syllable-feedback"}>{feedback}</p>
   </section>;
+}
+
+const mathVisualIcons = {
+  add: ["\uD83E\uDD55", "\uD83C\uDF45"],
+  subtract: ["\uD83C\uDF4E", "\uD83C\uDF4E"],
+  multiply: ["\u2B50", "\uD83D\uDCE6"],
+  divide: ["\uD83C\uDF6A", "\uD83C\uDF7D\uFE0F"]
+};
+
+function MathObjectGroup({ count, icon, label, muted = false }) {
+  return <div className={`math-object-group ${muted ? "muted" : ""}`}>
+    <div className="math-objects" aria-hidden="true">
+      {Array.from({ length: Math.max(0, count) }).map((_, index) => <span key={index}>{icon}</span>)}
+    </div>
+    <small>{label}</small>
+  </div>;
+}
+
+function MathVisualPanel({ operation, problem }) {
+  const currentOperation = mathOperations[operation] || mathOperations.add;
+  const [firstIcon, secondIcon] = mathVisualIcons[operation] || mathVisualIcons.add;
+  const groups = Array.from({ length: problem.left });
+  const divisionGroups = Array.from({ length: problem.right });
+
+  const speakVisual = () => {
+    const message = operation === "multiply"
+      ? `${problem.left} grupos com ${problem.right} em cada grupo.`
+      : operation === "divide"
+        ? `${problem.left} dividido em ${problem.right} grupos.`
+        : `${problem.left} ${currentOperation.speak} ${problem.right}.`;
+    speak(message);
+  };
+
+  return <aside className="math-visual-panel">
+    <strong>Apoio visual</strong>
+    <div className="math-visual-title">
+      <span>{problem.left}</span>
+      <small>{currentOperation.symbol}</small>
+      <span>{problem.right}</span>
+    </div>
+
+    {operation === "add" && <div className="math-visual-content">
+      <MathObjectGroup count={problem.left} icon={firstIcon} label={`${problem.left} cenourinha(s)`} />
+      <div className="math-visual-symbol">+</div>
+      <MathObjectGroup count={problem.right} icon={secondIcon} label={`${problem.right} tomatinho(s)`} />
+    </div>}
+
+    {operation === "subtract" && <div className="math-visual-content">
+      <MathObjectGroup count={problem.left} icon={firstIcon} label={`${problem.left} maca(s)`} />
+      <div className="math-visual-symbol">-</div>
+      <MathObjectGroup count={problem.right} icon={secondIcon} label={`tirar ${problem.right}`} muted />
+    </div>}
+
+    {operation === "multiply" && <div className="math-visual-content multiply">
+      {groups.map((_, groupIndex) => <MathObjectGroup key={groupIndex} count={problem.right} icon={firstIcon} label={`grupo ${groupIndex + 1}`} />)}
+    </div>}
+
+    {operation === "divide" && <div className="math-visual-content divide">
+      {divisionGroups.map((_, groupIndex) => <MathObjectGroup key={groupIndex} count={problem.answer} icon={firstIcon} label={`pratinho ${groupIndex + 1}`} />)}
+    </div>}
+
+    <div className="math-visual-note">
+      <span>Toque nos desenhos e conte com calma.</span>
+      <button className="tool primary" onClick={speakVisual}>Falar apoio</button>
+    </div>
+  </aside>;
 }
 
 function Exercises({ bump }) {
