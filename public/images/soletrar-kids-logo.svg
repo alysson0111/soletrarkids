@@ -1,39 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
   <title id="title">Logo Soletrar Kids</title>
-  <desc id="desc">Símbolo com infinito colorido, balão de fala, movimento e conexão para comunicação, neurodiversidade e psicomotricidade.</desc>
+  <desc id="desc">Balao de fala com as letras a b c para representar comunicacao e alfabetizacao.</desc>
   <defs>
-    <linearGradient id="warm" x1="46" y1="64" x2="194" y2="176" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ffd95a"/>
-      <stop offset=".45" stop-color="#f36b6b"/>
-      <stop offset="1" stop-color="#b89cff"/>
-    </linearGradient>
-    <linearGradient id="cool" x1="42" y1="170" x2="202" y2="74" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#6ed39a"/>
-      <stop offset=".5" stop-color="#58a6ff"/>
-      <stop offset="1" stop-color="#b8ead6"/>
-    </linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#10201b" flood-opacity=".2"/>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#10201b" flood-opacity=".22"/>
     </filter>
   </defs>
-
   <rect width="240" height="240" rx="42" fill="#f7fbf8"/>
   <circle cx="120" cy="120" r="94" fill="#eaf7f1"/>
-
-  <g filter="url(#softShadow)">
-    <path d="M67 137c-22 0-38-16-38-37s16-37 38-37c18 0 32 11 53 34 21-23 35-34 53-34 22 0 38 16 38 37s-16 37-38 37c-18 0-32-11-53-34-21 23-35 34-53 34Zm0-25c8 0 17-5 36-25-15-15-26-22-36-22-11 0-19 8-19 18s8 29 19 29Zm70-25c19 20 28 25 36 25 11 0 19-8 19-18s-8-29-19-29c-10 0-21 7-36 22Z" fill="url(#cool)"/>
-    <path d="M67 137c-22 0-38-16-38-37s16-37 38-37c18 0 32 11 53 34 21-23 35-34 53-34 22 0 38 16 38 37s-16 37-38 37c-18 0-32-11-53-34-21 23-35 34-53 34Zm0-25c8 0 17-5 36-25-15-15-26-22-36-22-11 0-19 8-19 18s8 29 19 29Zm70-25c19 20 28 25 36 25 11 0 19-8 19-18s-8-29-19-29c-10 0-21 7-36 22Z" fill="url(#warm)" opacity=".52"/>
+  <g filter="url(#shadow)">
+    <path d="M61 64h118c27 0 47 19 47 44s-20 44-47 44h-51l-47 40v-40H61c-27 0-47-19-47-44s20-44 47-44Z" fill="#14231f"/>
+    <path d="M63 79h114c18 0 32 12 32 29s-14 29-32 29h-59l-28 24v-24H63c-18 0-32-12-32-29s14-29 32-29Z" fill="#ffffff" opacity=".08"/>
   </g>
-
-  <path d="M74 127h73c18 0 32 12 32 28s-14 28-32 28h-34l-27 22v-22H74c-18 0-32-12-32-28s14-28 32-28Z" fill="#14231f"/>
-  <circle cx="86" cy="155" r="7" fill="#ffd95a"/>
-  <circle cx="112" cy="155" r="7" fill="#6ed39a"/>
-  <circle cx="138" cy="155" r="7" fill="#58a6ff"/>
-
-  <path d="M112 68c9-18 25-26 48-24" fill="none" stroke="#14231f" stroke-width="10" stroke-linecap="round"/>
-  <path d="M151 41l14 3-10 11" fill="none" stroke="#14231f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="70" cy="69" r="9" fill="#f36b6b"/>
-  <circle cx="92" cy="50" r="7" fill="#ffd95a"/>
-  <circle cx="171" cy="185" r="8" fill="#b89cff"/>
-  <circle cx="192" cy="164" r="6" fill="#58a6ff"/>
+  <circle cx="81" cy="108" r="25" fill="#ffd95a"/>
+  <circle cx="120" cy="108" r="25" fill="#6ed39a"/>
+  <circle cx="159" cy="108" r="25" fill="#58a6ff"/>
+  <text x="81" y="125" text-anchor="middle" fill="#14231f" font-family="Arial, sans-serif" font-size="46" font-weight="900">a</text>
+  <text x="120" y="125" text-anchor="middle" fill="#14231f" font-family="Arial, sans-serif" font-size="46" font-weight="900">b</text>
+  <text x="159" y="125" text-anchor="middle" fill="#14231f" font-family="Arial, sans-serif" font-size="46" font-weight="900">c</text>
 </svg>
