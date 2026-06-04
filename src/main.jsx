@@ -292,6 +292,7 @@ const viewText = {
   comunicar: ["Comunicação por escolhas visuais", "Monte frases com símbolos, fale pelo sintetizador de voz e reduza barreiras para crianças com apraxia, dificuldades motoras de fala, TEA ou comunicação não verbal."],
   alfabeto: ["Alfabeto visual de A a Z", "Selecione uma letra para ver imagens e palavras correspondentes. Toque em uma palavra para ouvir e adicionar à frase atual."],
   vogais: ["Vogais e Alfabeto", "Treine vogais e famílias silábicas como BA BE BI BO BU com apoio de fala em português do Brasil."],
+  cacapalavras: ["Caça Palavras", "Encontre palavras por tema, como frutas, transportes e objetos, com imagens e fala guiando a próxima letra correta."],
   desenhos: ["Desenhos", "Pinte a grade por número, selecione a cor correta e veja a imagem se formando."],
   concentracao: ["Concentração", "Escolha a cor pelo número, siga a sequência dos blocos e veja o desenho se formando com apoio de fala."],
   rotinas: ["Rotinas visuais previsíveis", "Use sequências curtas para antecipar transições, diminuir ansiedade e apoiar autonomia."],
@@ -778,11 +779,12 @@ function App() {
           <p>O Plano Free libera {planSettings.freeMinutosDiarios || 10} minutos de uso por dia. Para acesso completo, migre para o Plano Pro por {proPlanPriceText}/mês.</p>
           <button className="tool primary" onClick={migrateToPro}>Migrar para Pro</button>
         </section> : <>
-        <div className={`workspace ${["admin", "administrador"].includes(view) ? "workspace-full" : ""}`}>
+        <div className={`workspace ${["admin", "administrador", "cacapalavras"].includes(view) ? "workspace-full" : ""}`}>
           <div>
             {view === "comunicar" && <Communication symbols={symbols} category={category} setCategory={setCategory} query={query} setQuery={setQuery} addPhrase={addPhrase} custom={custom} setCustom={setCustom} />}
             {view === "alfabeto" && <Alphabet letter={letter} setLetter={setLetter} addPhrase={addPhrase} words={currentLetterWords} status={letterStatus} saveCurrentLetter={saveCurrentLetter} saveWordsForLetter={saveWordsForLetter} submitPendingWord={submitPendingWord} isRoot={isRoot} />}
             {view === "vogais" && <VowelsAlphabet />}
+            {view === "cacapalavras" && <WordSearchGame bump={bump} />}
             {view === "desenhos" && <DrawingsByNumber bump={bump} selectedNumber={drawingSelectedNumber} setSelectedNumber={setDrawingSelectedNumber} />}
             {view === "concentracao" && <PaintByNumber bump={bump} selectedNumber={paintSelectedNumber} setSelectedNumber={setPaintSelectedNumber} />}
             {view === "rotinas" && <Routines bump={bump} />}
@@ -796,7 +798,7 @@ function App() {
           </div>
           {view === "desenhos" && <ColorNumberPanel colors={drawingColors} selectedNumber={drawingSelectedNumber} setSelectedNumber={setDrawingSelectedNumber} />}
           {view === "concentracao" && <ColorNumberPanel colors={paintColors} selectedNumber={paintSelectedNumber} setSelectedNumber={setPaintSelectedNumber} />}
-          {!["admin", "administrador", "desenhos", "concentracao"].includes(view) && <PhrasePanel phrase={phrase} setPhrase={setPhrase} phraseText={phraseText} bump={bump} />}
+          {!["admin", "administrador", "desenhos", "concentracao", "cacapalavras"].includes(view) && <PhrasePanel phrase={phrase} setPhrase={setPhrase} phraseText={phraseText} bump={bump} />}
         </div>
         </>}
       </main>
@@ -805,7 +807,7 @@ function App() {
 }
 
 function Sidebar({ view, setView, lowStim, setLowStim, largeTouch, setLargeTouch, user, isRoot }) {
-  const items = [["comunicar", "Comunicar", "💬"], ["alfabeto", "A-Z", "🔤"], ["vogais", "Vogais e Alfabeto", "🅰️"], ["desenhos", "Desenhos", "🖍️"], ["concentracao", "Concentração", "🎨"], ["rotinas", "Rotinas", "📅"], ["continhas", "Continhas", "🧮"], ["treino", "Treino", "🗣️"], ["prompts", "Pistas", "✨"], ["progresso", "Progresso", "📊"]];
+  const items = [["comunicar", "Comunicar", "💬"], ["alfabeto", "A-Z", "🔤"], ["vogais", "Vogais e Alfabeto", "🅰️"], ["cacapalavras", "Caça Palavras", "🔎"], ["desenhos", "Desenhos", "🖍️"], ["concentracao", "Concentração", "🎨"], ["rotinas", "Rotinas", "📅"], ["continhas", "Continhas", "🧮"], ["treino", "Treino", "🗣️"], ["prompts", "Pistas", "✨"], ["progresso", "Progresso", "📊"]];
   if (isRoot) items.push(["aprovacoes", "Aprovações", "✅"], ["admin", "Usuários", "👥"], ["administrador", "Administrador", "⚙️"]);
   return (
     <aside className="sidebar">
@@ -848,6 +850,227 @@ function SymbolCard({ item, onClick }) {
 function Picto({ value }) {
   const isImage = typeof value === "string" && (value.startsWith("/") || value.startsWith("http") || value.startsWith("data:"));
   return <span className="picto">{isImage ? <img src={value} alt="" /> : value}</span>;
+}
+
+const wordSearchThemes = [
+  {
+    id: "frutas",
+    title: "Frutas",
+    words: [
+      { word: "banana", label: "Banana", icon: "🍌" },
+      { word: "abacaxi", label: "Abacaxi", icon: "🍍" },
+      { word: "morango", label: "Morango", icon: "🍓" },
+      { word: "melancia", label: "Melancia", icon: "🍉" },
+      { word: "laranja", label: "Laranja", icon: "🍊" },
+      { word: "uva", label: "Uva", icon: "🍇" }
+    ]
+  },
+  {
+    id: "transportes",
+    title: "Transportes",
+    words: [
+      { word: "carro", label: "Carro", icon: "🚗" },
+      { word: "bicicleta", label: "Bicicleta", icon: "🚲" },
+      { word: "aviao", label: "Avião", icon: "✈️" },
+      { word: "onibus", label: "Ônibus", icon: "🚌" },
+      { word: "moto", label: "Moto", icon: "🏍️" },
+      { word: "barco", label: "Barco", icon: "⛵" }
+    ]
+  },
+  {
+    id: "imagens",
+    title: "Imagens diversas",
+    words: [
+      { word: "casa", label: "Casa", icon: "🏠" },
+      { word: "bola", label: "Bola", icon: "⚽" },
+      { word: "livro", label: "Livro", icon: "📚" },
+      { word: "lapis", label: "Lápis", icon: "✏️" },
+      { word: "estrela", label: "Estrela", icon: "⭐" },
+      { word: "cachorro", label: "Cachorro", icon: "🐶" }
+    ]
+  }
+];
+
+function normalizeSearchWord(value) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z]/g, "")
+    .toUpperCase();
+}
+
+function buildWordSearch(theme, size = 12) {
+  const directions = [
+    { row: 0, col: 1 },
+    { row: 1, col: 0 },
+    { row: 1, col: 1 },
+    { row: -1, col: 1 }
+  ];
+  const alphabetLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const grid = Array.from({ length: size }, () => Array.from({ length: size }, () => ""));
+  const placements = {};
+
+  theme.words.forEach((item) => {
+    const letters = normalizeSearchWord(item.word).split("");
+    let placed = false;
+
+    for (let attempt = 0; attempt < 160 && !placed; attempt += 1) {
+      const direction = directions[Math.floor(Math.random() * directions.length)];
+      const startRow = Math.floor(Math.random() * size);
+      const startCol = Math.floor(Math.random() * size);
+      const endRow = startRow + direction.row * (letters.length - 1);
+      const endCol = startCol + direction.col * (letters.length - 1);
+      if (endRow < 0 || endRow >= size || endCol < 0 || endCol >= size) continue;
+
+      const cells = letters.map((letter, index) => ({
+        row: startRow + direction.row * index,
+        col: startCol + direction.col * index,
+        letter
+      }));
+
+      if (!cells.every((cell) => !grid[cell.row][cell.col] || grid[cell.row][cell.col] === cell.letter)) continue;
+
+      cells.forEach((cell) => {
+        grid[cell.row][cell.col] = cell.letter;
+      });
+      placements[item.word] = cells.map(({ row, col, letter }) => ({ row, col, letter }));
+      placed = true;
+    }
+  });
+
+  for (let row = 0; row < size; row += 1) {
+    for (let col = 0; col < size; col += 1) {
+      if (!grid[row][col]) grid[row][col] = alphabetLetters[Math.floor(Math.random() * alphabetLetters.length)];
+    }
+  }
+
+  return { grid, placements };
+}
+
+function WordSearchGame({ bump }) {
+  const [themeId, setThemeId] = useState("frutas");
+  const [round, setRound] = useState(0);
+  const [activeWord, setActiveWord] = useState("banana");
+  const [selectedCells, setSelectedCells] = useState([]);
+  const [foundWords, setFoundWords] = useState({});
+  const [feedback, setFeedback] = useState("Escolha uma palavra e toque nas letras em ordem.");
+  const theme = wordSearchThemes.find((item) => item.id === themeId) || wordSearchThemes[0];
+  const puzzle = useMemo(() => buildWordSearch(theme), [themeId, round]);
+  const activeItem = theme.words.find((item) => item.word === activeWord) || theme.words[0];
+  const activeCells = puzzle.placements[activeItem.word] || [];
+  const selectedKey = (row, col) => selectedCells.some((cell) => cell.row === row && cell.col === col);
+  const foundKey = (row, col) => Object.entries(foundWords).some(([word, found]) =>
+    found && (puzzle.placements[word] || []).some((cell) => cell.row === row && cell.col === col)
+  );
+
+  useEffect(() => {
+    const firstWord = theme.words[0]?.word || "";
+    setActiveWord(firstWord);
+    setSelectedCells([]);
+    setFoundWords({});
+    setFeedback(`Tema ${theme.title}. Encontre ${theme.words[0]?.label || "a primeira palavra"}.`);
+  }, [themeId, round]);
+
+  const chooseTheme = (nextThemeId) => {
+    const nextTheme = wordSearchThemes.find((item) => item.id === nextThemeId) || wordSearchThemes[0];
+    setThemeId(nextTheme.id);
+    speak(`Tema ${nextTheme.title}.`);
+  };
+
+  const chooseWord = (word) => {
+    const item = theme.words.find((entry) => entry.word === word);
+    setActiveWord(word);
+    setSelectedCells([]);
+    const message = item ? `Procure ${item.label}. Comece pela letra ${normalizeSearchWord(item.word)[0]}.` : "Escolha uma palavra.";
+    setFeedback(message);
+    speak(message);
+  };
+
+  const restart = () => {
+    setRound((current) => current + 1);
+    speak("Novo caça palavras.");
+  };
+
+  const touchCell = (row, col, letter) => {
+    if (foundWords[activeItem.word]) {
+      setFeedback(`${activeItem.label} já foi encontrada. Escolha outra palavra.`);
+      speak(`${activeItem.label} já foi encontrada.`);
+      return;
+    }
+
+    const nextCell = activeCells[selectedCells.length];
+    if (!nextCell) return;
+
+    if (nextCell.row !== row || nextCell.col !== col) {
+      const message = `Toque na letra correta. Agora procure a letra ${nextCell.letter}.`;
+      setFeedback(message);
+      speak(message);
+      return;
+    }
+
+    const nextSelection = selectedCells.concat({ row, col, letter });
+    setSelectedCells(nextSelection);
+
+    if (nextSelection.length === activeCells.length) {
+      const nextFound = { ...foundWords, [activeItem.word]: true };
+      const nextWord = theme.words.find((item) => !nextFound[item.word]);
+      setFoundWords(nextFound);
+      setSelectedCells([]);
+      setFeedback(nextWord ? `Muito bem. ${activeItem.label} encontrada. Agora procure ${nextWord.label}.` : "Parabéns. Você encontrou todas as palavras.");
+      speak(nextWord ? `Muito bem. ${activeItem.label} encontrada. Agora procure ${nextWord.label}.` : "Parabéns. Você encontrou todas as palavras.");
+      bump();
+      if (nextWord) setActiveWord(nextWord.word);
+      return;
+    }
+
+    const upcoming = activeCells[nextSelection.length];
+    const message = upcoming ? `Isso. Próxima letra: ${upcoming.letter}.` : "Continue.";
+    setFeedback(message);
+    speak(message);
+  };
+
+  const completed = theme.words.every((item) => foundWords[item.word]);
+
+  return <section className="word-search-board">
+    <div className="word-search-toolbar">
+      <div className="segmented">
+        {wordSearchThemes.map((item) => <button key={item.id} className={themeId === item.id ? "active" : ""} onClick={() => chooseTheme(item.id)}>{item.title}</button>)}
+      </div>
+      <button className="tool" onClick={() => speak(`Tema ${theme.title}. Procure ${activeItem.label}.`)}>Falar dica</button>
+      <button className="tool primary" onClick={restart}>Novo caça palavras</button>
+    </div>
+
+    <div className="word-search-layout">
+      <div className="word-search-grid" style={{ "--search-size": puzzle.grid.length }}>
+        {puzzle.grid.map((rowItems, row) => rowItems.map((letter, col) => {
+          const selected = selectedKey(row, col);
+          const found = foundKey(row, col);
+          return <button
+            key={`${row}-${col}`}
+            className={`word-search-cell ${selected ? "selected" : ""} ${found ? "found" : ""}`}
+            onClick={() => touchCell(row, col, letter)}
+            aria-label={`Letra ${letter}`}
+          >
+            {letter}
+          </button>;
+        }))}
+      </div>
+
+      <aside className="word-search-words">
+        <strong>Palavras do tema</strong>
+        {theme.words.map((item) => <button
+          key={item.word}
+          className={`word-search-word ${activeWord === item.word ? "active" : ""} ${foundWords[item.word] ? "done" : ""}`}
+          onClick={() => chooseWord(item.word)}
+        >
+          <span>{item.icon}</span>
+          <span><b>{item.label}</b><small>{foundWords[item.word] ? "Encontrada" : "Procurar"}</small></span>
+        </button>)}
+      </aside>
+    </div>
+
+    <p className={completed ? "syllable-feedback" : "syllable-feedback error"}>{feedback}</p>
+  </section>;
 }
 
 function VowelsAlphabet() {
