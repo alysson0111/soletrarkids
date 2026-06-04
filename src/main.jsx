@@ -899,7 +899,16 @@ function normalizeSearchWord(value) {
     .toUpperCase();
 }
 
-function buildWordSearch(theme, size = 12) {
+function shuffleList(items) {
+  const shuffled = items.slice();
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function buildWordSearch(words, size = 12) {
   const directions = [
     { row: 0, col: 1 },
     { row: 1, col: 0 },
@@ -910,7 +919,7 @@ function buildWordSearch(theme, size = 12) {
   const grid = Array.from({ length: size }, () => Array.from({ length: size }, () => ""));
   const placements = {};
 
-  theme.words.forEach((item) => {
+  words.forEach((item) => {
     const letters = normalizeSearchWord(item.word).split("");
     let placed = false;
 
@@ -955,8 +964,9 @@ function WordSearchGame({ bump }) {
   const [foundWords, setFoundWords] = useState({});
   const [feedback, setFeedback] = useState("Escolha uma palavra e toque nas letras em ordem.");
   const theme = wordSearchThemes.find((item) => item.id === themeId) || wordSearchThemes[0];
-  const puzzle = useMemo(() => buildWordSearch(theme), [themeId, round]);
-  const activeItem = theme.words.find((item) => item.word === activeWord) || theme.words[0];
+  const shuffledWords = useMemo(() => shuffleList(theme.words), [themeId, round]);
+  const puzzle = useMemo(() => buildWordSearch(shuffledWords), [shuffledWords]);
+  const activeItem = shuffledWords.find((item) => item.word === activeWord) || shuffledWords[0];
   const activeCells = puzzle.placements[activeItem.word] || [];
   const selectedKey = (row, col) => selectedCells.some((cell) => cell.row === row && cell.col === col);
   const foundKey = (row, col) => Object.entries(foundWords).some(([word, found]) =>
@@ -964,12 +974,12 @@ function WordSearchGame({ bump }) {
   );
 
   useEffect(() => {
-    const firstWord = theme.words[0]?.word || "";
+    const firstWord = shuffledWords[0]?.word || "";
     setActiveWord(firstWord);
     setSelectedCells([]);
     setFoundWords({});
-    setFeedback(`Tema ${theme.title}. Encontre ${theme.words[0]?.label || "a primeira palavra"}.`);
-  }, [themeId, round]);
+    setFeedback(`Tema ${theme.title}. Encontre ${shuffledWords[0]?.label || "a primeira palavra"}.`);
+  }, [themeId, round, shuffledWords, theme.title]);
 
   const chooseTheme = (nextThemeId) => {
     const nextTheme = wordSearchThemes.find((item) => item.id === nextThemeId) || wordSearchThemes[0];
@@ -978,7 +988,7 @@ function WordSearchGame({ bump }) {
   };
 
   const chooseWord = (word) => {
-    const item = theme.words.find((entry) => entry.word === word);
+    const item = shuffledWords.find((entry) => entry.word === word);
     setActiveWord(word);
     setSelectedCells([]);
     const message = item ? `Procure ${item.label}. Comece pela letra ${normalizeSearchWord(item.word)[0]}.` : "Escolha uma palavra.";
@@ -1013,7 +1023,7 @@ function WordSearchGame({ bump }) {
 
     if (nextSelection.length === activeCells.length) {
       const nextFound = { ...foundWords, [activeItem.word]: true };
-      const nextWord = theme.words.find((item) => !nextFound[item.word]);
+      const nextWord = shuffledWords.find((item) => !nextFound[item.word]);
       setFoundWords(nextFound);
       setSelectedCells([]);
       setFeedback(nextWord ? `Muito bem. ${activeItem.label} encontrada. Agora procure ${nextWord.label}.` : "Parabéns. Você encontrou todas as palavras.");
@@ -1029,7 +1039,7 @@ function WordSearchGame({ bump }) {
     speak(message);
   };
 
-  const completed = theme.words.every((item) => foundWords[item.word]);
+  const completed = shuffledWords.every((item) => foundWords[item.word]);
 
   return <section className="word-search-board">
     <div className="word-search-toolbar">
@@ -1058,7 +1068,7 @@ function WordSearchGame({ bump }) {
 
       <aside className="word-search-words">
         <strong>Palavras do tema</strong>
-        {theme.words.map((item) => <button
+        {shuffledWords.map((item) => <button
           key={item.word}
           className={`word-search-word ${activeWord === item.word ? "active" : ""} ${foundWords[item.word] ? "done" : ""}`}
           onClick={() => chooseWord(item.word)}
