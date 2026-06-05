@@ -41,6 +41,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .login-preview div:nth-child(3) { background: #fff3d4; border-color: #ead59a; }
 .login-preview strong { color: #14231f; font-size: .95rem; }
 .login-preview span { font-size: 2rem; }
+.install-app-button { min-height: 46px; width: fit-content; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 10px 14px; border-radius: 8px; background: #14231f; color: #fff; font-weight: 900; box-shadow: 0 10px 22px rgba(20, 35, 31, .16); }
+.install-app-button span { font-size: 1.25rem; line-height: 1; }
 .login-card { padding: 22px; border-radius: 8px; background: rgba(255,255,255,.94); border: 1px solid #dce6e0; box-shadow: 0 20px 48px rgba(43, 70, 61, .12); display: grid; align-content: center; gap: 16px; }
 .auth-intro { display: grid; gap: 5px; padding: 2px 2px 6px; }
 .auth-intro strong { font-size: 1.35rem; line-height: 1.2; color: #14231f; }
@@ -410,8 +412,8 @@ textarea { width: 100%; min-height: 92px; resize: vertical; }
 
 @media (max-width: 620px) {
   body { background: linear-gradient(180deg, rgba(184,234,214,.25), transparent 250px), var(--bg); }
-  main { padding: 16px 12px 28px; }
-  .login-page { padding: 12px; place-items: start center; }
+  main { padding: 16px max(12px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+  .login-page { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); place-items: start center; }
   .login-shell { gap: 12px; }
   .login-hero { padding: 20px; gap: 14px; }
   .login-logo { width: 82px; height: 82px; padding: 8px; }
@@ -425,6 +427,7 @@ textarea { width: 100%; min-height: 92px; resize: vertical; }
   .login-card { padding: 16px; }
   .auth-intro strong { font-size: 1.15rem; }
   .plan-choice { grid-template-columns: 1fr; }
+  .install-app-button { width: 100%; }
   .sidebar { padding: 12px 12px 10px; }
   .brand { gap: 10px; }
   .brand-mark { width: 40px; height: 40px; border-radius: 8px; }

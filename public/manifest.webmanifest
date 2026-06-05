@@ -1,0 +1,21 @@
+{
+  "name": "Soletrar Kids",
+  "short_name": "Soletrar Kids",
+  "description": "Comunicacao assistiva, fala, alfabetizacao e atividades educativas.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7fbf8",
+  "theme_color": "#14231f",
+  "categories": ["education", "kids"],
+  "icons": [
+    {
+      "src": "/images/favicon-balao.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

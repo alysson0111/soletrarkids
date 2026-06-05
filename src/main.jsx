@@ -434,6 +434,38 @@ function authMessage(error) {
   return `Não foi possível concluir. Código do erro: ${code || "desconhecido"}.`;
 }
 
+function InstallAppButton() {
+  const [installPrompt, setInstallPrompt] = useState(null);
+
+  useEffect(() => {
+    const handlePrompt = (event) => {
+      event.preventDefault();
+      setInstallPrompt(event);
+    };
+    const handleInstalled = () => setInstallPrompt(null);
+
+    window.addEventListener("beforeinstallprompt", handlePrompt);
+    window.addEventListener("appinstalled", handleInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handlePrompt);
+      window.removeEventListener("appinstalled", handleInstalled);
+    };
+  }, []);
+
+  if (!installPrompt) return null;
+
+  const install = async () => {
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+  };
+
+  return <button type="button" className="install-app-button" onClick={install}>
+    <span aria-hidden="true">&#8595;</span>
+    Instalar no celular
+  </button>;
+}
+
 function LoginScreen({ onAuth }) {
   const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
@@ -576,6 +608,7 @@ function LoginScreen({ onAuth }) {
           <div><strong>Preciso</strong><span>&#129658;</span></div>
           <div><strong>Sinto</strong><span>&#128522;</span></div>
         </div>
+        <InstallAppButton />
       </div>
       <div className="login-card">
         <div className="auth-intro">
@@ -2525,3 +2558,9 @@ function PhrasePanel({ phrase, setPhrase, phraseText }) {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
+
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
